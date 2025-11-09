@@ -1,0 +1,12 @@
+.authentication-page {
+    background-image: url('/public/5443270.jpg');
+    background-position-x: -1px;
+    background-size: 105%;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+

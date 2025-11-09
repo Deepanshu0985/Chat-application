@@ -1,0 +1,39 @@
+.hide-page {
+    display: none
+}
+
+.instructions-sent-popup {
+    background-color: var(--secondary-color);
+    color: var(--tertiary-color);
+    width: 400px;
+    padding: 45px 50px;
+    border-radius: 20px;
+    border: 2px solid var(--secondary-color-light)
+}
+
+.instructions-sent-popup > h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.instructions-sent-popup > h4 {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    font-weight: 500;
+    margin-bottom: 20px;
+    line-height: 1.4rem;
+}
+
+.instructions-sent-popup .close-popup-button {
+    margin-bottom: 10px;
+    height: 40px;
+    width: 100%;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.1s;
+    margin-top: 5px;
+    transition: 0.3s;
+}

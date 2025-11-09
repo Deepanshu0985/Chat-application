@@ -1,0 +1,116 @@
+/* --------------------------------- */
+/* ----- toggle dropdown button ---- */
+/* --------------------------------- */
+
+.chat-header-menu {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    position: relative;
+    transition: 0.2s;
+}
+
+.icon-padding {
+    padding: 5px;
+    z-index: 99999;
+    background-color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.icon-padding > svg {
+    transform: scale(1.1);
+}
+
+.icon-padding .rot0deg {
+    fill: var(--tertiary-color-dark);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.icon-padding .rot0deg:hover {
+    fill: var(--tertiary-color);
+}
+
+.icon-padding .rot45deg {
+    fill: var(--tertiary-color);
+    transform: scale(1.1) rotate(45deg);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.icon-padding .rot45deg:hover {
+    fill: var(--tertiary-color);
+}
+
+/* --------------------------------- */
+/* ------------ dropdown ----------- */
+/* --------------------------------- */
+
+.menu__dropdown {
+    position: absolute;
+    right: 0px;
+    top: 18.5px;
+    background-color: var(--secondary-color-dark);
+    z-index: 9999;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 2px solid var(--secondary-color-light)
+}
+
+.menu__dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transition: 0.2s ease-in-out;
+}
+
+.menu__dropdown.hide {
+    opacity: 0;
+    visibility: hidden;
+    /* transform: scale(0); */
+    transform-origin: top right;
+    transition: 0s ease-in-out;
+}
+
+
+/* --------------------------------- */
+/* --------- dropdown items -------- */
+/* --------------------------------- */
+
+.dropdown__item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 7px;
+    flex-wrap: nowrap;
+    transition: 0.3s;
+    border-bottom: 2px solid var(--secondary-color-light);
+    padding: 12px 25px;
+    width: 190px;
+}
+
+.dropdown__item:last-of-type {
+    border-bottom: none
+}
+
+.dropdown__item > svg {
+    transform: scale(0.7);
+}
+
+.dropdown__item:hover {
+    cursor: pointer;
+    color: var(--primary-color-light);
+}
+
+.dropdown__item:last-of-type:hover {
+    cursor: pointer;
+    color: var(--red);
+}

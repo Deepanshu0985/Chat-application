@@ -1,0 +1,8 @@
+.main-page {
+    color: snow;
+    display: flex;
+    flex-direction: row;
+    background-color: var(--secondary-color);
+    height: 100vh;
+    overflow: hidden
+  }

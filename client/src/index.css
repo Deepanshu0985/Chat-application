@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary-color: rgb(107,138,253);
+  --primary-color-dark: #607ce3;
+  --primary-color-light: #7995fd;
+  --secondary-color-dark: rgb(22, 23, 25);
+  --secondary-color: rgb(32, 35, 40);
+  --secondary-color-light: rgb(46, 51, 61);
+  --tertiary-color: rgb(255, 255, 255);
+  --tertiary-color-dark: rgb(128, 130, 150);
+  --red: #ff0a54;
+
+  --primary-color: #5e2bff;
+  --primary-color-dark: #4b22cc;
+  --primary-color-light: #7e55ff;
+  /* --red: #ff4d6d; */
+  /* --secondary-color-dark: rgb(10, 10, 10); */
+
+  --pink: #ff4d6d;
+  /* --cerise: #F0386B; */
+  --amaranth: #CE4257;
+  --coral: #FF7F51;
+  --earth-yellow: #EAB464;
+  --viridian: #2A7F62;
+  /* --blue: #4361ee; */
+  --blue: rgb(107,138,253);
+
+}
+
+body {
+  background-color: var(--secondary-color-dark);
+}
+
+

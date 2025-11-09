@@ -1,0 +1,33 @@
+.start-new-chat {
+    color: var(--secondary-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    transition: 0.3s;
+    font-size: 0.9rem;
+    gap: 30px;
+    line-height: 1.8rem;
+}
+
+.start-new-chat svg {
+    transform: scale(2.4);
+}
+
+.start-new-chat svg:hover {
+    cursor: pointer;
+    fill: var(--purple)
+}
+
+.start-new-chat span {
+    padding-bottom: 1px;
+    border-bottom: 1.5px solid var(--secondary-color);
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.start-new-chat span:hover {
+    padding-bottom: 1px;
+    border-bottom: 1.5px solid var(--tertiary-color);
+}
