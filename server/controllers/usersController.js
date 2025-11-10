@@ -9,9 +9,11 @@ const { v4: uuidv4 } = require('uuid');
 
 
 // Initialize Firebase Admin SDK
+console.log("initializing firebase admin sdk...")
+// console.log(serviceAccount)
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: `https://${process.env.PROJECT_ID}.firebaseio.com`,
+    databaseURL: `https://chat-app-15cab.firebaseio.com`,
 })
 
 const userController = {
@@ -24,30 +26,40 @@ const userController = {
     // Controller for creating a new user
     createNewUser: async (req, res) => {
         try {
-            // res.status(200).json("*** it works ***")
-            // Get user data from the request body
-            const { firebaseUserId, email, username } = req.body
+          // Get user data from request body
+          console.log("REQ BODY:", req.body)
 
-            const profilePictureUrl = assignAvatarToUser(username)
-
-            // Create a new user instance using the User model
-            const newUser = new User({
-                firebaseUserId,
-                email,
-                username,
-                profilePictureUrl,
-        })
-
-        // Save the user to the database
-        const savedUser = await newUser.save()
-
-        // Respond with the saved user data
-        res.status(201).json(savedUser)
-
+          const { firebaseUserId, email, username } = req.body;
+      
+          // Check if user already exists
+          const existingUser = await User.findOne({ firebaseUserId });
+          console.log("existingUser", existingUser)
+          if (existingUser) {
+            return res.status(200).json(existingUser); // return existing user instead of error
+          }
+      
+          const profilePictureUrl = assignAvatarToUser(username);
+      
+          // Create the user
+          const newUser = new User({
+            firebaseUserId,
+            email,
+            username,
+            profilePictureUrl,
+          });
+      
+          // Save user in DB
+          const savedUser = await newUser.save();
+      
+          // Send response
+          res.status(201).json(savedUser);
+      
         } catch (error) {
-            res.status(500).json({ error: 'Error creating a new user ( ˘︹˘ )' })
+          console.error(error);
+          res.status(500).json({ error: 'Error creating a new user ( ˘︹˘ )' });
         }
-    },
+      },
+      
 
     // Controller for getting user details by MongoDB _id
     getUserByMongoDBUserId: async (req, res) => {
@@ -55,6 +67,7 @@ const userController = {
             const userId = req.params.userId // Get the MongoDB _id from the request parameters
             // Query the database to find the user by MongoDB _id
             const user = await User.findById(userId)
+            console.log("user", user)
 
             if (!user) {
                 // If the user is not found, return a 404 status with a custom message

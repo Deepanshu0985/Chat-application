@@ -1,35 +1,61 @@
 {
   "name": "server",
   "version": "1.0.0",
+  "type": "commonjs",
   "engines": {
-    "node": "14.17.5"
+    "node": ">=20.0.0"
   },
-  "description": "",
+  "description": "Real-time chat application server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --coverage --detectOpenHandles --forceExit",
+    "test:watch": "jest --watch",
+    "test:unit": "jest --testPathPattern='(testController|usersController|roomsController|chatLogsController)' --detectOpenHandles --forceExit",
+    "test:integration": "jest --testPathPattern=integration --detectOpenHandles --forceExit",
     "start": "node index.js",
-    "start-dev": "nodemon index.js",
+    "start:dev": "nodemon index.js",
     "build": "node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@socket.io/redis-adapter": "^8.2.1",
-    "axios": "^1.4.0",
+    "@socket.io/redis-adapter": "^8.3.0",
+    "axios": "^1.7.7",
     "cors": "^2.8.5",
-    "date-fns": "^2.30.0",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "firebase-admin": "^11.10.1",
-    "mongoose": "^7.3.4",
-    "nanoid": "^4.0.2",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "firebase-admin": "^13.0.2",
+    "mongoose": "^8.7.1",
+    "nanoid": "^5.0.9",
     "node-schedule": "^2.1.1",
-    "redis": "^4.6.7",
-    "socket.io": "^4.7.1",
-    "uuid": "^9.0.0"
+    "redis": "^4.7.0",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.3",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/Tests/"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!**/node_modules/**",
+      "!**/Tests/**",
+      "!jest.config.js",
+      "!index.js"
+    ]
   }
 }

@@ -121,7 +121,7 @@ const roomController = {
             const _id = req.params.roomId
 
             // Query the database to find the room
-            const room = await Room.findById(_id)?.populate("users")
+            const room = await Room.findById(_id).populate("users")
 
             if (!room) {
                 return res.status(404).json({ error: 'Room not found'})
@@ -160,7 +160,7 @@ const roomController = {
             const allRooms = []
 
             for (let roomId of roomIdsArray) {
-                const room = await Room.findById(roomId)?.populate("users")
+                const room = await Room.findById(roomId).populate("users")
                 if (!room) { 
                     continue 
                 }
@@ -199,7 +199,7 @@ const roomController = {
             const allRooms = []
 
             for (let roomId of roomIdsArray) {
-                const room = await Room.findById(roomId)?.populate("users")
+                const room = await Room.findById(roomId).populate("users")
                 if (!room) { 
                     continue 
                 }
@@ -408,7 +408,7 @@ const roomController = {
             const { originalRoomName, newRoomName, updatedById, updatedByUsername } = req.body
             const room = await Room.findById(_id)
             if (!room) {
-                res.status(404).json({ error: "Room not found" })
+                return res.status(404).json({ error: "Room not found" })
             }
 
             room.roomName = newRoomName
@@ -459,7 +459,7 @@ const roomController = {
             console.log("newRoomIconUrl...", newRoomIconUrl, _id)
             const room = await Room.findById(_id)
             if (!room) {
-                res.status(404).json({ error: "Room not found" })
+                return res.status(404).json({ error: "Room not found" })
             }
 
             room.profilePictureUrl = newRoomIconUrl

@@ -3,7 +3,7 @@ const cors = require("cors")
 const { connectToDatabase  }= require("./config/connectToDatabse")
 require('dotenv').config()
 const { Server } = require("socket.io")
-const { connectToRedis, client } = require('./config/connectToRedis')
+const { connectToRedis, client, isRedisConnected } = require('./config/connectToRedis')
 const { socket } = require('./utils/socketIO')
 const { syncCache } = require('./utils/syncCache')
 
@@ -11,7 +11,14 @@ const { syncCache } = require('./utils/syncCache')
 const app = express()
 app.use(cors())
 app.use(express.json())
-connectToDatabase().then(async () => syncCache())
+connectToDatabase().then(async () => {
+  // Only sync cache if Redis is available
+  if (await connectToRedis()) {
+    await syncCache()
+  } else {
+    console.log('Skipping cache sync - Redis not available')
+  }
+})
 
 // const allowedOrigins = ['http://example.com', 'http://localhost:3000'];
 // app.use(cors({
@@ -28,16 +35,29 @@ const PORT = process.env.PORT || 10000 // https://boisterous-sunburst-f3d32f.net
 const server = app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`)
 })
-
 const io = new Server(server, {
     cors: {
-        // origin: "http://localhost:3000",
-        origin: "https://boisterous-sunburst-f3d32f.netlify.app",
+        origin: process.env.CLIENT_URL || "http://localhost:3000",
         methods: ["GET", "POST", "PUT", "DELETE"]
     }
 })
 
-connectToRedis().then(() => { socket(io) }) 
+// Connect to Redis and initialize socket - don't block server startup if Redis fails
+connectToRedis()
+  .then((connected) => {
+    if (connected) {
+      socket(io)
+      console.log('Socket.IO initialized with Redis')
+    } else {
+      socket(io)
+      console.log('Socket.IO initialized without Redis (limited functionality)')
+    }
+  })
+  .catch((error) => {
+    console.error('Error initializing Redis:', error.message)
+    socket(io)
+    console.log('Socket.IO initialized without Redis (limited functionality)')
+  }) 
 
 // Enable CORS for specific routes
 app.use((req, res, next) => {

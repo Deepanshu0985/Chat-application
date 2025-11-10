@@ -2,7 +2,7 @@ const ChatLog = require('../models/chatLogModel')
 const Room = require('../models/roomModel')
 const User = require('../models/userModel')
 const mongoose = require('mongoose')
-const { client, hgetAsync, hsetAsync, connectToRedis  } = require('../config/connectToRedis')
+const { client, hgetAsync, hsetAsync, connectToRedis, isRedisConnected } = require('../config/connectToRedis')
 
 
 const chatLogController = {
@@ -20,13 +20,19 @@ const chatLogController = {
             // mongoose.Types.ObjectId(roomId)
 
             const chatLog = await ChatLog.findOne({ roomId: _id })
+            
+            if (!chatLog) {
+                return res.status(404).json({ error: 'Chat log not found for this room' })
+            }
 
             // Save each message to chat log asynchronously using for...of loop
             for (const message of chatLogArray) {
                 const newMessage = {
-                    messageSender: message.messageSender,
-                    messageContent: message.messageContent,
-                    messageCreated: message.messageCreated || new Date(),
+                    messageId: message.messageId || message.messageSender,
+                    senderId: message.senderId || message.messageSender,
+                    username: message.username,
+                    messageContent: message.messageContent || message.message,
+                    dateCreated: message.dateCreated || message.messageCreated || new Date(),
                 }
 
                 // Add the new message to the chatLog's messages array
@@ -45,7 +51,18 @@ const chatLogController = {
 
     getChatLogsByRoomsArray: async (req, res) => {
         try {
-            const roomIdsArray = req.query.roomIdsArray
+            let roomIdsArray = req.query.roomIdsArray
+            // Handle array query parameter (can be string or array)
+            if (typeof roomIdsArray === 'string') {
+                try {
+                    roomIdsArray = JSON.parse(roomIdsArray)
+                } catch {
+                    roomIdsArray = [roomIdsArray]
+                }
+            }
+            if (!Array.isArray(roomIdsArray)) {
+                roomIdsArray = [roomIdsArray]
+            }
             const allChats = []
 
             for (let roomId of roomIdsArray) {
@@ -55,12 +72,21 @@ const chatLogController = {
                 }
 
                 // get cached messages from redis
+                let cachedChats = []
+                if (isRedisConnected()) {
+                    try {
                 const jsonMessageLog = await client.HGET('chatLogs', roomId)
-                const cachedChats = jsonMessageLog ? JSON.parse(jsonMessageLog) : []
+                        cachedChats = jsonMessageLog ? JSON.parse(jsonMessageLog) : []
+                    } catch (error) {
+                        console.log('Error fetching from Redis:', error.message)
+                        cachedChats = []
+                    }
+                }
                 // for each message in cached chats get sender id and populate chat {}
                 // with sender username, profile pic,
                                 
                 const chatLog = await ChatLog.find({ roomId })
+                const messages = chatLog && chatLog.length > 0 ? chatLog[0].messages : []
                 allChats.push({
                     roomId: room._id,
                     roomName: room.roomName,
@@ -74,7 +100,7 @@ const chatLogController = {
                         })
                         }) || null,
                     roomDeletedUsers: [],
-                    messagesArray: [...chatLog[0].messages, ...cachedChats] || [] // convert messageSender to userName/email
+                    messagesArray: [...messages, ...cachedChats] || [] // convert messageSender to userName/email
                 })
             }
 
@@ -103,11 +129,20 @@ const chatLogController = {
                 }
 
                 // get cached messages from redis
+                let cachedChats = []
+                if (isRedisConnected()) {
+                    try {
                 const jsonMessageLog = await client.HGET('chatLogs', roomId)
-                const cachedChats = jsonMessageLog ? JSON.parse(jsonMessageLog) : []
+                        cachedChats = jsonMessageLog ? JSON.parse(jsonMessageLog) : []
+                    } catch (error) {
+                        console.log('Error fetching from Redis:', error.message)
+                        cachedChats = []
+                    }
+                }
 
 
                 const chatLog = await ChatLog.find({ roomId })
+                const messages = chatLog && chatLog.length > 0 ? chatLog[0].messages : []
                 allChats.push({
                     roomId: room._id,
                     roomName: room.roomName, // delete
@@ -127,7 +162,7 @@ const chatLogController = {
                     //     // {messageContent: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...", messageSender: "user1"},
                     //     // {messageContent: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", messageSender: "user2"}
                     // ],
-                    messagesArray: [...chatLog[0].messages, ...cachedChats] || [] // convert messageSender to userName/email
+                    messagesArray: [...messages, ...cachedChats] || [] // convert messageSender to userName/email
                 })
             }
 

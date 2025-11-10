@@ -1,6 +1,12 @@
-const { client } = require("../config/connectToRedis")
+const { client, isRedisConnected } = require("../config/connectToRedis")
 
 const saveGlobalAlertToRedis = async (data, userIdsArray, ignore) => {
+    // Skip if Redis is not connected
+    if (!isRedisConnected()) {
+        console.log('Redis not available - skipping global alert save')
+        return
+    }
+
     try {
         for (let userId of userIdsArray) {  
             if (userId == ignore.toString()) { continue }
@@ -9,7 +15,8 @@ const saveGlobalAlertToRedis = async (data, userIdsArray, ignore) => {
             await client.HSET('globalAlerts', userId.toString(), JSON.stringify([ ...messageLog, data ]))
         }
     } catch (error) {
-        console.log("saveGlobalAlertToRedis error", error)
+        console.log("saveGlobalAlertToRedis error", error.message)
+        // Don't throw - Redis errors shouldn't break the application
     }
 }
 
