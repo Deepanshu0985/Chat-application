@@ -1,3 +1,4 @@
 client/src/firebase.js
 server/.env
 server/serviceAccount.json
+*.json
