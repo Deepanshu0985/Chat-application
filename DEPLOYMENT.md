@@ -39,6 +39,13 @@ This application uses a split deployment strategy:
     *   Add the following variables:
         *   `REACT_APP_API_URL`: `https://<your-render-url>/api`
         *   `REACT_APP_SOCKET_URL`: `https://<your-render-url>`
+        *   `REACT_APP_FIREBASE_API_KEY`: `AIzaSyCKSMk3tQc4R-3j0qOvlYIiClYa3swlIoU`
+        *   `REACT_APP_FIREBASE_AUTH_DOMAIN`: `chat-app-2de01.firebaseapp.com`
+        *   `REACT_APP_FIREBASE_PROJECT_ID`: `chat-app-2de01`
+        *   `REACT_APP_FIREBASE_STORAGE_BUCKET`: `chat-app-2de01.firebasestorage.app`
+        *   `REACT_APP_FIREBASE_MESSAGING_SENDER_ID`: `807803774229`
+        *   `REACT_APP_FIREBASE_APP_ID`: `1:807803774229:web:cd657a9c00e9e87cc3b51c`
+        *   `REACT_APP_FIREBASE_MEASUREMENT_ID`: `G-DLZ0PNZBKZ`
 5.  **Deploy**: Click **Deploy**.
 
 ## Part 3: Final Configuration
