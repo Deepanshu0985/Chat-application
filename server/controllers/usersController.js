@@ -2,23 +2,38 @@ const User = require('../models/userModel')
 const Room = require('../models/roomModel')
 const firebaseAdmin = require('firebase-admin');
 const admin = require("firebase-admin");
-const serviceAccount = require("../serviceAccount.json");
 const { assignAvatarToUser } = require('./functions/assignAvatarToUser')
 const { v4: uuidv4 } = require('uuid');
-
-
-
 // Initialize Firebase Admin SDK
 console.log("initializing firebase admin sdk...")
-// console.log(serviceAccount)
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: `https://chat-app-15cab.firebaseio.com`,
-})
+
+let serviceAccount;
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } catch (error) {
+        console.error("Error parsing FIREBASE_SERVICE_ACCOUNT environment variable:", error);
+    }
+} else {
+    try {
+        serviceAccount = require("../serviceAccount.json");
+    } catch (error) {
+        console.error("serviceAccount.json not found and FIREBASE_SERVICE_ACCOUNT not set");
+    }
+}
+
+if (serviceAccount) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: `https://chat-app-15cab.firebaseio.com`,
+    })
+} else {
+    console.error("Failed to initialize Firebase Admin SDK: No credentials provided");
+}
 
 const userController = {
 
-    test: async (req,res) => {
+    test: async (req, res) => {
         console.log("running test func...")
         res.status(400).send("it works")
     },
@@ -26,40 +41,40 @@ const userController = {
     // Controller for creating a new user
     createNewUser: async (req, res) => {
         try {
-          // Get user data from request body
-          console.log("REQ BODY:", req.body)
+            // Get user data from request body
+            console.log("REQ BODY:", req.body)
 
-          const { firebaseUserId, email, username } = req.body;
-      
-          // Check if user already exists
-          const existingUser = await User.findOne({ firebaseUserId });
-          console.log("existingUser", existingUser)
-          if (existingUser) {
-            return res.status(200).json(existingUser); // return existing user instead of error
-          }
-      
-          const profilePictureUrl = assignAvatarToUser(username);
-      
-          // Create the user
-          const newUser = new User({
-            firebaseUserId,
-            email,
-            username,
-            profilePictureUrl,
-          });
-      
-          // Save user in DB
-          const savedUser = await newUser.save();
-      
-          // Send response
-          res.status(201).json(savedUser);
-      
+            const { firebaseUserId, email, username } = req.body;
+
+            // Check if user already exists
+            const existingUser = await User.findOne({ firebaseUserId });
+            console.log("existingUser", existingUser)
+            if (existingUser) {
+                return res.status(200).json(existingUser); // return existing user instead of error
+            }
+
+            const profilePictureUrl = assignAvatarToUser(username);
+
+            // Create the user
+            const newUser = new User({
+                firebaseUserId,
+                email,
+                username,
+                profilePictureUrl,
+            });
+
+            // Save user in DB
+            const savedUser = await newUser.save();
+
+            // Send response
+            res.status(201).json(savedUser);
+
         } catch (error) {
-          console.error(error);
-          res.status(500).json({ error: 'Error creating a new user ( ˘︹˘ )' });
+            console.error(error);
+            res.status(500).json({ error: 'Error creating a new user ( ˘︹˘ )' });
         }
-      },
-      
+    },
+
 
     // Controller for getting user details by MongoDB _id
     getUserByMongoDBUserId: async (req, res) => {
@@ -77,10 +92,10 @@ const userController = {
             // Return the user details in the response
             res.status(200).json(user)
 
-            } catch (error) {
+        } catch (error) {
             // If there is an error, return a 500 status with a generic error message
             res.status(500).json({ error: 'Error fetching user details by MongoDB _id' })
-            }
+        }
     },
 
     // Controller for getting user details by firebase uid
@@ -89,7 +104,7 @@ const userController = {
             const firebaseUserId = req.params.firebaseUserId // Get the firebase uid from the request parameters
 
             // Query the database to find the user by MongoDB _id
-            const user = await User.find({firebaseUserId})
+            const user = await User.find({ firebaseUserId })
 
             if (!user) {
                 // If the user is not found, return a 404 status with a custom message
@@ -105,7 +120,7 @@ const userController = {
     },
 
     // Controller for updating user details; username
-    updateUsername: async (req,res) => {
+    updateUsername: async (req, res) => {
         try {
             console.log("updating username...")
             // Get the MongoDB _id from the request parameters
@@ -123,7 +138,7 @@ const userController = {
             const { newUsername } = req.body
 
             const updatedUserDetails = await User.findByIdAndUpdate(
-              _id, { username: newUsername }, {new: true}
+                _id, { username: newUsername }, { new: true }
             )
 
             res.status(200).json(updatedUserDetails)
@@ -136,7 +151,7 @@ const userController = {
     },
 
     // Controller for updating user details; user profile picture
-    updateUserProfilePicture: async (req,res) => {
+    updateUserProfilePicture: async (req, res) => {
         try {
             // Get the MongoDB _id from the request parameters
             const _id = req.params.userId
@@ -150,14 +165,14 @@ const userController = {
             }
 
             // Get the new username the request body
-            const  { updatedUserProfilePictureUrl } = req.body
+            const { updatedUserProfilePictureUrl } = req.body
 
             const updatedUserDetails = await User.findOneAndUpdate(
-              {_id}, { profilePictureUrl: updatedUserProfilePictureUrl }, {new: true}
+                { _id }, { profilePictureUrl: updatedUserProfilePictureUrl }, { new: true }
             )
             res.status(201).json(updatedUserDetails)
 
-        } catch (error){
+        } catch (error) {
             // If there is an error, return a 500 status with a generic error message
             console.log(error)
             res.status(500).json({ error: 'Error updating profile picture' })
@@ -174,10 +189,10 @@ const userController = {
     deleteUser: async (req, res) => {
         try {
             const userId = req.params.userId
-      
+
             // Find the user by userId
             const user = await User.findById(userId)
-        
+
             // Check if the user exists
             if (!user) {
                 return res.status(404).json({ error: 'User not found' })
@@ -188,8 +203,8 @@ const userController = {
             // 3 Clear user rooms array
             for (let roomId of user.rooms) {
                 // find room, remove user
-                await Room.findOneAndUpdate( 
-                    { _id: roomId },  
+                await Room.findOneAndUpdate(
+                    { _id: roomId },
                     { $pull: { users: user._id } },
                     { new: true }
                 )
@@ -198,29 +213,29 @@ const userController = {
             // 4 Delete user email form DB
             // 5 Change user status from activeUser = true -> false   
             // 6 Update profile pic to https://i.postimg.cc/63k0R0FB/image-k3qx3-O9-Dr-RZb.jpg
-            await User.findByIdAndUpdate( userId, 
-                { 
+            await User.findByIdAndUpdate(userId,
+                {
                     email: `deletedEmail_${uuidv4()}`,
-                    profilePictureUrl: "https://i.postimg.cc/13JNx5YY/image-Ot-ILHw-Wp-NCPt.jpg", 
+                    profilePictureUrl: "https://i.postimg.cc/13JNx5YY/image-Ot-ILHw-Wp-NCPt.jpg",
                     rooms: [],
                     activeUser: false,
-                }, 
-                { new: true } 
+                },
+                { new: true }
             )
 
             // CLEAR USER NOTIFICATIONS FROM REDIS
 
             // 1 Delete the user from Firebase authentication
             await firebaseAdmin.auth().deleteUser(user.firebaseUserId)
-        
+
             // Return a success response
             res.status(200).json({ message: 'User deleted successfully' })
 
-            } catch (error) {
-                // Handle any errors that occurred during the process
-                console.error(error)
-                res.status(500).json({ error: 'Error deleting user' })
-            }
+        } catch (error) {
+            // Handle any errors that occurred during the process
+            console.error(error)
+            res.status(500).json({ error: 'Error deleting user' })
+        }
     },
 
 }

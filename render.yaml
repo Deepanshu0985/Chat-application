@@ -16,3 +16,5 @@ services:
         sync: false
       - key: REDIS_URL
         sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false

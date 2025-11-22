@@ -21,6 +21,7 @@ This application uses a split deployment strategy:
         *   `ATLAS_URI_1`: Your MongoDB connection string.
         *   `PROJECT_ID`: Your Firebase project ID.
         *   `REDIS_URL`: Your Redis URL (or use `REDIS_DISABLED=true` if you don't have one).
+        *   `FIREBASE_SERVICE_ACCOUNT`: The content of your `server/serviceAccount.json` file. Paste the entire JSON content as the value.
         *   `PORT`: `10000`
 5.  **Deploy**: Click **Create Web Service**.
 6.  **Copy URL**: Once deployed, copy the service URL (e.g., `https://chat-app-server.onrender.com`).
